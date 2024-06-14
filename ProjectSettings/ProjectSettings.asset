@@ -719,11 +719,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: 37906afd-5820-4f7c-aa4a-7474bb2fcb74
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: Lively-Game
+  organizationId: realguybackup
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 

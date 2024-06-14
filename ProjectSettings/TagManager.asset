@@ -9,6 +9,9 @@ TagManager:
   - Canvas
   - EventSystem
   - menu
+  - death barrier
+  - ladder
+  - jump
   layers:
   - Default
   - TransparentFX

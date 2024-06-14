@@ -8,10 +8,8 @@ public class CapsuleController : MonoBehaviour
     public float moveSpeed = 10.0f;
     public float sprintSpeed = 20.0f;
     public float jumpHeight = 5.0f;
-    public TextMeshProUGUI timerText;
     public TextMeshProUGUI stopwatchText;
-
-    private float timer = 0.0f;
+    public GameObject g;
     private float stopwatch = 0.0f;
     private bool isGrounded = true;
     private Transform capsuleTransform;
@@ -21,6 +19,7 @@ public class CapsuleController : MonoBehaviour
     private Vector3 movement;
     private bool isTimerRunning = false;
     private bool stopwatchDone = false;
+    private bool isInLadderAndW = false;
 
     void Start()
     {
@@ -45,9 +44,6 @@ public class CapsuleController : MonoBehaviour
         movement = cameraForward * verticalMovement + cameraRight * horizontalMovement;
         movement = Vector3.ClampMagnitude(movement, 1.0f) * moveSpeed;
 
-        // Use cameraForward instead of cameraTransform.forward
-        Vector3 jumpDirection = cameraForward + Vector3.up;
-
         if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)) && !isTimerRunning && !stopwatchDone)
         {
             isTimerRunning = true;
@@ -60,9 +56,9 @@ public class CapsuleController : MonoBehaviour
         }
 
         // Jump using the spacebar!
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && timer < 0.1f)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            rb.AddForce(jumpDirection * Mathf.Sqrt(jumpHeight * -2.0f * Physics.gravity.y), ForceMode.VelocityChange);
+            rb.AddForce(Vector3.up * Mathf.Sqrt(jumpHeight * -2.0f * Physics.gravity.y), ForceMode.VelocityChange);
             isGrounded = false;
         }
 
@@ -84,14 +80,9 @@ public class CapsuleController : MonoBehaviour
             stopwatchText.text = "Time: " + stopwatch.ToString("F2");
         }
 
-        if (isGrounded)
+        if (isInLadderAndW)
         {
-            timer -= Time.deltaTime;
-            if (timer < 0.0f)
-            {
-                timer = 0.0f;
-            }
-            timerText.text = "Time until stamina fills up: " + timer.ToString("F1");
+            rb.AddForce((Vector3.up * Mathf.Sqrt(jumpHeight * -2.0f * Physics.gravity.y))/50, ForceMode.VelocityChange);
         }
     }
 
@@ -99,19 +90,49 @@ public class CapsuleController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            if (!isTimerRunning)
-            {
-                isTimerRunning = false;
-            }
             isGrounded = true;
-            timer = 0.5f;
-            timerText.text = "Time until stamina fills up: " + timer.ToString("F1");
         }
 
         if (collision.gameObject.CompareTag("Finish"))
         {
             isTimerRunning = false;
             stopwatchDone = true;
+        }
+
+        if (collision.gameObject.CompareTag("ladder"))
+        {
+            if (Input.GetKey(KeyCode.W))
+            {
+                isInLadderAndW = true;
+            }
+            else
+            {
+                isInLadderAndW = false;
+            }
+        }
+
+        if (collision.gameObject.CompareTag("jump"))
+        {
+            rb.AddForce((Vector3.up * Mathf.Sqrt(jumpHeight * -2.0f * Physics.gravity.y))*5, ForceMode.VelocityChange);
+        }
+
+        if (collision.gameObject.CompareTag("death barrier"))
+        {
+            float y = (float) 1.217;
+            g.transform.position = new Vector3(0, y, -10);
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+        }
+
+        if (collision.gameObject.CompareTag("ladder"))
+        {
+            isInLadderAndW = false;
         }
     }
 }
